@@ -1,0 +1,1284 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model andaman_agents {
+  id                    Int     @id @default(autoincrement())
+  sl_no                 Int?
+  registration_no       String? @db.Text
+  agent_name            String? @db.Text
+  agent_address         String? @db.Text
+  individual_firm       String? @db.VarChar(50)
+  registration_validity String? @db.VarChar(50)
+  renewal               String? @db.VarChar(50)
+
+  @@index([registration_validity], map: "idx_validity")
+}
+
+model andaman_projects {
+  id                      Int       @id @default(autoincrement())
+  sl_no                   Int?
+  project_registration_no String?   @db.Text
+  applicant_name_address  String?   @db.Text
+  project_details_address String?   @db.Text
+  approval_details        String?   @db.Text
+  project_completion_date String?   @db.Text
+  other_details           String?   @db.Text
+  approval_pdf_url        String?   @db.Text
+  approval_pdf_filename   String?   @db.VarChar(255)
+  carpet_pdf_url          String?   @db.Text
+  carpet_pdf_filename     String?   @db.VarChar(255)
+  progress_pdf_url        String?   @db.Text
+  progress_pdf_filename   String?   @db.VarChar(255)
+  current_status          String?   @db.Text
+  scraped_at              DateTime? @db.DateTime(0)
+
+  @@index([project_registration_no(length: 100)], map: "idx_reg_no")
+}
+
+model ap_agents {
+  id                 Int     @id @default(autoincrement())
+  serial_no          Int?
+  registration_id    String? @unique(map: "registration_id") @db.VarChar(60)
+  name               String? @db.Text
+  place              String? @db.Text
+  date_of_submission String? @db.VarChar(100)
+  date_of_approval   String? @db.VarChar(100)
+  valid_till         String? @db.VarChar(100)
+
+  @@index([registration_id], map: "idx_reg_id")
+  @@index([valid_till], map: "idx_valid_till")
+}
+
+model ap_complaint_orders {
+  id             Int     @id @default(autoincrement())
+  complaint_no   String? @db.Text
+  complaint_date String? @db.VarChar(50)
+  pdf_url        String? @db.Text
+  pdf_filename   String? @db.VarChar(255)
+  pdf_size_kb    Int?
+
+  @@index([complaint_date], map: "idx_date")
+}
+
+model ap_project {
+  id                     Int       @id @default(autoincrement())
+  serial_no              Int?
+  aprera_registration_id String?   @unique(map: "aprera_registration_id") @db.VarChar(60)
+  project_name           String?   @db.Text
+  place                  String?   @db.Text
+  project_type           String?   @db.VarChar(100)
+  status                 String?   @db.VarChar(100)
+  date_of_approval       String?   @db.VarChar(100)
+  expected_completion    String?   @db.VarChar(100)
+  imported_at            DateTime? @db.DateTime(0)
+
+  @@index([aprera_registration_id], map: "idx_reg_id")
+  @@index([status], map: "idx_status")
+  @@index([project_type], map: "idx_type")
+}
+
+model ap_projects {
+  id                     Int       @id @default(autoincrement())
+  serial_no              Int?
+  aprera_registration_id String?   @unique(map: "aprera_registration_id") @db.VarChar(60)
+  project_name           String?   @db.Text
+  place                  String?   @db.Text
+  project_type           String?   @db.VarChar(100)
+  status                 String?   @db.VarChar(50)
+  date_of_approval       String?   @db.VarChar(20)
+  expected_completion    String?   @db.VarChar(20)
+  imported_at            DateTime? @db.DateTime(0)
+
+  @@index([aprera_registration_id], map: "idx_reg_id")
+  @@index([status], map: "idx_status")
+  @@index([project_type], map: "idx_type")
+}
+
+model approved_agents {
+  id                         Int       @id @default(autoincrement())
+  sr_no                      String?   @db.VarChar(50)
+  agent_ack_no               String?   @db.VarChar(200)
+  agent_reg_no               String    @unique(map: "agent_reg_no") @db.VarChar(200)
+  agent_name                 String    @db.VarChar(500)
+  agent_address              String?   @db.Text
+  agent_district             String?   @db.VarChar(100)
+  fee_paid                   String?   @db.VarChar(50)
+  registration_approved_date DateTime? @db.Date
+  registration_expire_date   DateTime? @db.Date
+  agent_type                 String?   @db.VarChar(50)
+  agent_mobile_no            String?   @db.VarChar(20)
+  agent_email_id             String?   @db.VarChar(255)
+  agent_pan_no               String?   @db.VarChar(50)
+  status                     String?   @db.VarChar(50)
+  created_on                 DateTime? @db.DateTime(0)
+  submission_date            DateTime? @db.DateTime(0)
+  renewal_date               DateTime? @db.DateTime(0)
+  scraped_at                 DateTime? @db.DateTime(0)
+  created_at                 DateTime? @default(now()) @db.Timestamp(0)
+  updated_at                 DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([agent_name(length: 255)], map: "idx_agent_name")
+  @@index([agent_reg_no], map: "idx_agent_reg_no")
+  @@index([agent_district], map: "idx_district")
+  @@index([scraped_at], map: "idx_scraped_at")
+  @@index([status], map: "idx_status")
+}
+
+model approved_projects {
+  id                       Int       @id @default(autoincrement())
+  sr_no                    String?   @db.VarChar(50)
+  project_name             String    @db.VarChar(500)
+  project_address          String?   @db.Text
+  project_type             String?   @db.VarChar(100)
+  promoter_name            String?   @db.VarChar(300)
+  email_id                 String?   @db.VarChar(255)
+  mobile_no                String?   @db.VarChar(20)
+  project_registration_no  String    @unique(map: "project_registration_no") @db.VarChar(200)
+  project_registration_url String?   @db.Text
+  scraped_at               DateTime? @db.DateTime(0)
+  created_at               DateTime? @default(now()) @db.Timestamp(0)
+  updated_at               DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([project_name(length: 255)], map: "idx_project_name")
+  @@index([promoter_name(length: 255)], map: "idx_promoter_name")
+  @@index([project_registration_no], map: "idx_registration_no")
+  @@index([scraped_at], map: "idx_scraped_at")
+}
+
+model assam_agents {
+  id                   Int       @id @default(autoincrement())
+  serial_no            Int?
+  registration_cert_no String?   @unique(map: "registration_cert_no") @db.VarChar(60)
+  agent_name           String?   @db.Text
+  district             String?   @db.VarChar(100)
+  category             String?   @db.VarChar(50)
+  cert_issuing_date    String?   @db.VarChar(20)
+  cert_expiry_date     String?   @db.VarChar(20)
+  certificate_pdf_url  String?   @db.Text
+  pdf_filename         String?   @db.VarChar(255)
+  pdf_size_kb          Int?
+  download_status      String?   @db.VarChar(50)
+  downloaded_at        DateTime? @db.DateTime(0)
+
+  @@index([district], map: "idx_district")
+  @@index([registration_cert_no], map: "idx_reg_cert")
+  @@index([download_status], map: "idx_status")
+}
+
+model assam_orders {
+  id              Int       @id @default(autoincrement())
+  title_header    String?   @db.Text
+  date_of_order   String?   @db.VarChar(50)
+  file_no         String?   @db.VarChar(100)
+  pdf_url         String?   @db.Text
+  pdf_filename    String?   @db.VarChar(255)
+  pdf_size_kb     Int?
+  download_status String?   @db.VarChar(50)
+  scraped_at      DateTime? @db.DateTime(0)
+
+  @@index([date_of_order], map: "idx_date")
+  @@index([file_no], map: "idx_file_no")
+}
+
+model assam_projects {
+  id            Int       @id @default(autoincrement())
+  serial_no     Int?
+  reg_cert_no   String?   @unique(map: "reg_cert_no") @db.VarChar(100)
+  project_name  String?   @db.Text
+  promoter      String?   @db.Text
+  location      String?   @db.Text
+  district      String?   @db.VarChar(100)
+  cert_pdf      String?   @db.Text
+  occupancy_pdf String?   @db.Text
+  qpr_pdf       String?   @db.Text
+  progress_pdf  String?   @db.Text
+  downloaded    Int?      @default(0)
+  imported_at   DateTime? @db.DateTime(0)
+}
+
+model assam_registered_projects {
+  id                          Int     @id @default(autoincrement())
+  serial_no                   Int?
+  registration_cert_number    String? @db.VarChar(100)
+  project_name                String? @db.Text
+  promoter                    String? @db.Text
+  project_location            String? @db.Text
+  project_district            String? @db.VarChar(100)
+  webpage_pdf_url             String? @db.Text
+  certificate_pdf_url         String? @db.Text
+  certificate_pdf_filename    String? @db.VarChar(255)
+  occupancy_pdf_url           String? @db.Text
+  occupancy_pdf_filename      String? @db.VarChar(255)
+  qpr_cumulative_pdf_url      String? @db.Text
+  qpr_cumulative_pdf_filename String? @db.VarChar(255)
+  qpr_quarterly_pdf_url       String? @db.Text
+
+  @@index([registration_cert_number], map: "idx_cert_no")
+}
+
+model bihar_defaulters {
+  id               Int       @id @default(autoincrement())
+  defaulter_type   String?   @db.Text
+  sl_no            String?   @db.Text
+  promoter_name    String?   @db.Text
+  promoter_address String?   @db.Text
+  district         String?   @db.Text
+  source_file      String?   @db.VarChar(255)
+  scraped_at       DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model bihar_interim_orders {
+  id               Int       @id @default(autoincrement())
+  notice_date      String?   @db.VarChar(50)
+  case_no          String?   @db.VarChar(100)
+  complainant      String?   @db.Text
+  respondent       String?   @db.Text
+  full_description String?   @db.Text
+  pdf_filename     String?   @db.VarChar(255)
+  scraped_at       DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model bihar_projects {
+  registration_no   String  @id @db.VarChar(255)
+  project_name      String? @db.VarChar(500)
+  promoter_name     String? @db.VarChar(500)
+  project_address   String? @db.Text
+  registration_date String? @db.VarChar(100)
+}
+
+model bihar_registered_agents {
+  registration_no   String    @id @db.VarChar(100)
+  agent_name        String?   @db.VarChar(255)
+  district          String?   @db.VarChar(100)
+  registration_date String?   @db.VarChar(50)
+  mobile_no         String?   @db.VarChar(20)
+  qr_content        String?   @db.Text
+  pdf_path          String?   @db.Text
+  scraped_at        DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model chhattisgarh_agents {
+  id                  Int     @id @default(autoincrement())
+  sn                  Int?
+  name                String? @db.VarChar(500)
+  agent_type          String? @db.VarChar(100)
+  registration_no     String? @unique(map: "registration_no") @db.VarChar(100)
+  district            String? @db.VarChar(200)
+  tehsil              String? @db.VarChar(200)
+  validity_period     String? @db.VarChar(200)
+  extended_validity   String? @db.VarChar(100)
+  registration_status String? @db.VarChar(50)
+  profile_url         String? @db.Text
+
+  @@index([district], map: "idx_district")
+  @@index([registration_no], map: "idx_reg")
+  @@index([registration_status], map: "idx_status")
+}
+
+model chhattisgarh_defaulters {
+  id                      Int       @id @default(autoincrement())
+  sn                      Int?
+  promoter_name           String?   @db.Text
+  project_name            String?   @db.VarChar(500)
+  registration_number     String?   @db.VarChar(100)
+  district                String?   @db.VarChar(200)
+  tehsil                  String?   @db.VarChar(200)
+  defaulter_approval_date String?   @db.VarChar(50)
+  has_registration        Boolean?  @default(true)
+  page_number             Int?
+  scraped_at              DateTime? @db.DateTime(0)
+
+  @@index([district], map: "idx_district")
+  @@index([promoter_name(length: 100)], map: "idx_promoter")
+  @@index([registration_number], map: "idx_reg")
+}
+
+model chhattisgarh_final_orders {
+  id                      Int       @id @default(autoincrement())
+  sn                      Int?
+  complaint_number        String?   @db.VarChar(200)
+  complaint_link          String?   @db.Text
+  applicant               String?   @db.Text
+  respondent              String?   @db.Text
+  project_name            String?   @db.Text
+  project_registration_no String?   @db.VarChar(200)
+  order_under_section     String?   @db.VarChar(500)
+  order_date              String?   @db.VarChar(50)
+  remark                  String?   @db.Text
+  pdf_url                 String?   @db.Text
+  pdf_filename            String?   @db.VarChar(500)
+  pdf_size_kb             Int?
+  download_status         String?   @db.VarChar(50)
+  page_number             Int?
+  scraped_at              DateTime? @db.DateTime(0)
+
+  @@index([complaint_number], map: "idx_complaint")
+  @@index([order_date], map: "idx_order_date")
+  @@index([project_registration_no], map: "idx_reg_no")
+}
+
+model chhattisgarh_projects_complete {
+  id                  Int       @id @default(autoincrement())
+  sn                  Int?
+  project_name        String?   @db.VarChar(500)
+  registration_number String?   @db.VarChar(100)
+  authorised_name     String?   @db.VarChar(500)
+  promoter_name       String?   @db.Text
+  project_type        String?   @db.VarChar(200)
+  district            String?   @db.VarChar(200)
+  tehsil              String?   @db.VarChar(200)
+  approved_date       String?   @db.VarChar(50)
+  proposed_end_date   String?   @db.VarChar(50)
+  extended_end_date   String?   @db.VarChar(50)
+  website_url         String?   @db.Text
+  certificate_status  String?   @db.VarChar(50)
+  page_number         Int?
+  raw_reg_text        String?   @db.Text
+  scraped_at          DateTime? @db.DateTime(0)
+
+  @@index([district], map: "idx_district")
+  @@index([registration_number], map: "idx_reg")
+}
+
+model complaints {
+  id           Int     @id @default(autoincrement())
+  complaint_no String? @db.VarChar(255)
+  complainant  String? @db.Text
+  respondent   String? @db.Text
+  status       String? @db.VarChar(255)
+  pdf_link     String? @db.Text
+}
+
+model complaints_district_wise {
+  id             Int       @id @default(autoincrement())
+  complaint_type String    @unique(map: "complaint_type") @db.VarChar(200)
+  ahmedabad      Int?      @default(0)
+  vadodara       Int?      @default(0)
+  surat          Int?      @default(0)
+  rajkot         Int?      @default(0)
+  gandhinagar    Int?      @default(0)
+  bhavnagar      Int?      @default(0)
+  valsad         Int?      @default(0)
+  others         Int?      @default(0)
+  total          Int?      @default(0)
+  scraped_at     DateTime? @db.DateTime(0)
+  created_at     DateTime? @default(now()) @db.Timestamp(0)
+  updated_at     DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([complaint_type], map: "idx_complaint_type")
+  @@index([scraped_at], map: "idx_scraped_at")
+}
+
+model complaints_summary {
+  id             Int       @id @default(autoincrement())
+  complaint_type String    @db.VarChar(200)
+  district_name  String?   @db.VarChar(100)
+  request_count  Int?      @default(0)
+  form_type      String?   @db.VarChar(100)
+  soumoto_case   String?   @db.VarChar(50)
+  scraped_at     DateTime? @db.DateTime(0)
+  created_at     DateTime? @default(now()) @db.Timestamp(0)
+  updated_at     DateTime? @default(now()) @db.Timestamp(0)
+
+  @@unique([complaint_type, district_name, form_type], map: "unique_complaint")
+  @@index([complaint_type], map: "idx_complaint_type")
+  @@index([district_name], map: "idx_district")
+  @@index([form_type], map: "idx_form_type")
+  @@index([scraped_at], map: "idx_scraped_at")
+}
+
+model delhi_agents {
+  id                       Int     @id @default(autoincrement())
+  sl_no                    Int?
+  agent_name               String? @db.VarChar(255)
+  agent_address            String? @db.Text
+  agent_phone              String? @db.VarChar(255)
+  agent_email              String? @db.VarChar(255)
+  agent_type               String? @db.VarChar(255)
+  registration_no          String? @db.VarChar(255)
+  valid_until              String? @db.VarChar(255)
+  certificate_pdf_url      String? @db.Text
+  certificate_pdf_filename String? @db.VarChar(255)
+
+  @@index([agent_name], map: "idx_agent_name")
+  @@index([registration_no], map: "idx_reg_no")
+}
+
+model delhi_complaints {
+  id                        Int     @id @default(autoincrement())
+  sl_no                     Int?
+  case_no                   String? @db.VarChar(100)
+  complaint_filed_date      String? @db.VarChar(50)
+  complainants              String? @db.Text
+  respondents               String? @db.Text
+  notice_pdfs               Json?
+  last_hearing_date         String? @db.VarChar(50)
+  judgement_pdfs            Json?
+  next_hearing_date         String? @db.VarChar(50)
+  notice_pdfs_downloaded    Json?
+  judgement_pdfs_downloaded Json?
+
+  @@index([case_no], map: "idx_case_no")
+  @@index([complainants(length: 100)], map: "idx_complainant")
+  @@index([respondents(length: 100)], map: "idx_respondent")
+}
+
+model delhi_promoters {
+  id                       Int     @id @default(autoincrement())
+  sl_no                    Int?
+  promoter_name            String? @db.Text
+  promoter_address         String? @db.Text
+  promoter_email           String? @db.VarChar(255)
+  promoter_phone           String? @db.VarChar(50)
+  project_name             String? @db.Text
+  project_location         String? @db.Text
+  registration_no          String? @db.VarChar(100)
+  valid_until              String? @db.VarChar(50)
+  construction_status      String? @db.VarChar(100)
+  certificate_pdf_url      String? @db.Text
+  certificate_pdf_filename String? @db.VarChar(255)
+  certificate_pdf_size_kb  Int?
+  extension_certificate    String? @db.Text
+  qpr_view_url             String? @db.Text
+
+  @@index([registration_no], map: "idx_reg_no")
+}
+
+model goa_agents {
+  id             Int       @id @default(autoincrement())
+  agent_type     String?   @db.VarChar(20)
+  agent_name     String?   @db.Text
+  agent_address  String?   @db.Text
+  date_of_action String?   @db.VarChar(50)
+  remarks        String?   @db.Text
+  scraped_at     DateTime? @db.DateTime(0)
+
+  @@index([date_of_action], map: "idx_date")
+  @@index([agent_type], map: "idx_type")
+}
+
+model goa_complaints {
+  id                        Int       @id @default(autoincrement())
+  sr_no                     Int?
+  complaint_name            String?   @db.Text
+  respondent_name           String?   @db.Text
+  complaint_date            String?   @db.VarChar(50)
+  final_order_document_name String?   @db.Text
+  final_order_url           String?   @db.Text
+  pdf_filename              String?   @db.VarChar(255)
+  pdf_size_kb               Int?
+  download_status           String?   @db.Text
+  scraped_at                DateTime? @db.DateTime(0)
+
+  @@index([sr_no], map: "idx_sr_no")
+}
+
+model goa_projects {
+  id              Int       @id @default(autoincrement())
+  project_type    String?   @db.VarChar(20)
+  project_name    String?   @db.Text
+  project_address String?   @db.Text
+  survey_no       String?   @db.Text
+  date_of_action  String?   @db.VarChar(50)
+  remarks         String?   @db.Text
+  scraped_at      DateTime? @db.DateTime(0)
+
+  @@index([date_of_action], map: "idx_date")
+  @@index([project_type], map: "idx_type")
+}
+
+model haryana_agents {
+  id                       Int       @id @default(autoincrement())
+  serial_no                Int?
+  registration_cert_no     String?   @db.Text
+  agent_name               String?   @db.Text
+  district                 String?   @db.VarChar(100)
+  category                 String?   @db.VarChar(50)
+  certificate_issuing_date String?   @db.VarChar(50)
+  certificate_expiry_date  String?   @db.VarChar(50)
+  certificate_url          String?   @db.Text
+  certificate_filename     String?   @db.VarChar(255)
+  scraped_at               DateTime? @db.DateTime(0)
+
+  @@index([category], map: "idx_category")
+  @@index([district], map: "idx_district")
+}
+
+model haryana_gurugram_agents {
+  id                     Int       @id @default(autoincrement())
+  serial_no              Int?
+  registration_no        String?   @db.VarChar(100)
+  agent_name             String?   @db.Text
+  district               String?   @default("GURUGRAM") @db.VarChar(100)
+  category               String?   @db.VarChar(100)
+  issue_date             String?   @db.VarChar(50)
+  expiry_date            String?   @db.VarChar(50)
+  certificate_url        String?   @db.Text
+  certificate_filename   String?   @db.VarChar(255)
+  certificate_downloaded Boolean?  @default(false)
+  extension_url          String?   @db.Text
+  extension_filename     String?   @db.VarChar(255)
+  extension_saved        Boolean?  @default(false)
+  scraped_at             DateTime? @db.DateTime(0)
+
+  @@index([agent_name(length: 100)], map: "idx_agent_name")
+  @@index([registration_no], map: "idx_registration")
+}
+
+model haryana_gurugram_projects {
+  id                        Int       @id @default(autoincrement())
+  serial_no                 Int?
+  registration_cert_number  String?   @db.Text
+  project_id                String?   @db.VarChar(100)
+  project_name              String?   @db.Text
+  builder                   String?   @db.Text
+  project_location          String?   @db.Text
+  project_district          String?   @default("GURUGRAM") @db.VarChar(100)
+  registered_with           String?   @db.VarChar(100)
+  form_ah_url               String?   @db.Text
+  form_ah_filename          String?   @db.VarChar(255)
+  form_ah_downloaded        Boolean?  @default(false)
+  registration_upto         String?   @db.VarChar(50)
+  certificate_url           String?   @db.Text
+  certificate_filename      String?   @db.VarChar(255)
+  certificate_downloaded    Boolean?  @default(false)
+  corrigendum_url           String?   @db.Text
+  corrigendum_filename      String?   @db.VarChar(255)
+  corrigendum_downloaded    Boolean?  @default(false)
+  quarterly_progress_url    String?   @db.Text
+  quarterly_progress_status String?   @db.VarChar(50)
+  monitoring_orders_url     String?   @db.Text
+  monitoring_orders_status  String?   @db.VarChar(50)
+  oc_cc_pcc_url             String?   @db.Text
+  oc_cc_pcc_filename        String?   @db.VarChar(255)
+  oc_cc_pcc_downloaded      Boolean?  @default(false)
+  project_status            String?   @db.VarChar(50)
+  additional_data           Json?
+  scraped_at                DateTime? @db.DateTime(0)
+
+  @@index([builder(length: 100)], map: "idx_builder")
+  @@index([project_id], map: "idx_project_id")
+  @@index([registration_cert_number(length: 100)], map: "idx_registration")
+}
+
+model haryana_judgements {
+  id                       Int       @id @default(autoincrement())
+  serial_no                Int?
+  complaint_no             String?   @db.Text
+  complainant_name         String?   @db.Text
+  respondent_name          String?   @db.Text
+  date_of_decision         String?   @db.VarChar(50)
+  judgement_url            String?   @db.Text
+  judgement_filename       String?   @db.VarChar(255)
+  judgement_uploading_date String?   @db.VarChar(50)
+  scraped_at               DateTime? @db.DateTime(0)
+
+  @@index([complaint_no(length: 100)], map: "idx_complaint_no")
+  @@index([date_of_decision], map: "idx_date")
+}
+
+model haryana_projects {
+  id                       Int       @id @default(autoincrement())
+  serial_no                Int?
+  registration_cert_number String?   @db.Text
+  project_id               String?   @db.VarChar(100)
+  project_name             String?   @db.Text
+  builder                  String?   @db.Text
+  project_location         String?   @db.Text
+  project_district         String?   @db.VarChar(100)
+  registered_with          String?   @db.VarChar(100)
+  form_ah_url              String?   @db.Text
+  form_ah_filename         String?   @db.VarChar(255)
+  registration_upto        String?   @db.VarChar(50)
+  certificate_url          String?   @db.Text
+  certificate_filename     String?   @db.VarChar(255)
+  scraped_at               DateTime? @db.DateTime(0)
+
+  @@index([project_id], map: "idx_project_id")
+}
+
+model jharkhand_judgements {
+  id              Int       @id @default(autoincrement())
+  sl_no           Int?
+  party_name      String?   @db.Text
+  case_number     String?   @db.VarChar(255)
+  court_name      String?   @db.VarChar(255)
+  category        String?   @db.VarChar(100)
+  pdf_url         String?   @db.Text
+  pdf_filename    String?   @db.VarChar(255)
+  pdf_size_kb     Int?
+  download_status String?   @db.VarChar(255)
+  page_number     Int?
+  downloaded_at   DateTime? @db.DateTime(0)
+  scraped_at      DateTime? @db.DateTime(0)
+
+  @@index([case_number], map: "idx_case")
+  @@index([category], map: "idx_category")
+  @@index([court_name], map: "idx_court")
+  @@index([download_status], map: "idx_status")
+}
+
+model jharkhand_offline_projects {
+  id                     Int       @id @default(autoincrement())
+  sl_no                  Int?
+  reg_no_date            String?   @db.Text
+  project_name_address   String?   @db.Text
+  developer_name_address String?   @db.Text
+  action_url             String?   @db.Text
+  page_number            Int?
+  scraped_at             DateTime? @db.DateTime(0)
+
+  @@index([page_number], map: "idx_page")
+  @@index([sl_no], map: "idx_sl_no")
+}
+
+model jharkhand_projects {
+  id               Int     @id @default(autoincrement())
+  sl_no            Int?
+  reg_no_date      String? @db.Text
+  project_name     String? @db.Text
+  address          String? @db.Text
+  remark           String? @db.Text
+  location_url     String? @db.Text
+  view_profile_url String? @db.Text
+
+  @@index([sl_no], map: "idx_sl_no")
+}
+
+model jk_agents {
+  id                     Int       @id @default(autoincrement())
+  serial_no              Int?
+  registration_no        String?   @db.VarChar(100)
+  agent_name             String?   @db.Text
+  district               String?   @db.VarChar(100)
+  category               String?   @db.VarChar(100)
+  issue_date             String?   @db.VarChar(50)
+  expiry_date            String?   @db.VarChar(50)
+  certificate_url        String?   @db.Text
+  certificate_filename   String?   @db.VarChar(255)
+  certificate_downloaded Boolean?  @default(false)
+  scraped_at             DateTime? @db.DateTime(0)
+
+  @@index([agent_name(length: 100)], map: "idx_agent_name")
+  @@index([registration_no], map: "idx_registration")
+}
+
+model jk_projects {
+  id               Int       @id @default(autoincrement())
+  serial_no        Int?
+  registration_no  String?   @db.VarChar(100)
+  project_id       String?   @db.VarChar(100)
+  project_name     String?   @db.Text
+  builder          String?   @db.Text
+  project_location String?   @db.Text
+  project_district String?   @db.VarChar(100)
+  registered_with  String?   @db.VarChar(100)
+  scraped_at       DateTime? @db.DateTime(0)
+
+  @@index([builder(length: 100)], map: "idx_builder")
+  @@index([project_id], map: "idx_project_id")
+  @@index([registration_no], map: "idx_registration")
+}
+
+model kerala_agents {
+  id                Int       @id @default(autoincrement())
+  user_id           String?   @db.VarChar(20)
+  agent_name        String?   @db.Text
+  agent_type        String?   @db.VarChar(30)
+  district          String?   @db.VarChar(100)
+  address           String?   @db.Text
+  landmark          String?   @db.VarChar(255)
+  pincode           String?   @db.VarChar(10)
+  individual_email  String?   @db.VarChar(255)
+  individual_mobile String?   @db.VarChar(20)
+  company_email     String?   @db.VarChar(255)
+  company_mobile    String?   @db.VarChar(20)
+  certificate_no    String?   @unique(map: "certificate_no") @db.VarChar(60)
+  role_id           String?   @db.VarChar(10)
+  info_type         String?   @db.VarChar(10)
+  tab_source        String?   @db.VarChar(30)
+  certification_url String?   @db.VarChar(255)
+  print_preview_url String?   @db.VarChar(255)
+  scraped_at        DateTime? @db.DateTime(0)
+
+  @@index([certificate_no], map: "idx_cert_no")
+  @@index([tab_source], map: "idx_tab")
+  @@index([user_id], map: "idx_user_id")
+}
+
+model kerala_causelist {
+  id               Int     @id @default(autoincrement())
+  complaint_id     String? @db.VarChar(60)
+  complainant_name String? @db.Text
+  respondent_name  String? @db.Text
+  hearing_date     String? @db.VarChar(20)
+  hearing_time     String? @db.VarChar(20)
+  authority_id     Int?
+  authority_name   String? @db.VarChar(50)
+
+  @@unique([complaint_id, hearing_date, authority_id], map: "uniq_cause")
+  @@index([authority_id], map: "idx_authority")
+  @@index([complaint_id(length: 40)], map: "idx_complaint_id")
+  @@index([hearing_date], map: "idx_hearing_date")
+}
+
+model kerala_complaints {
+  id                   Int       @id @default(autoincrement())
+  sr_no                Int?
+  record_id            String?   @db.VarChar(20)
+  complaint_id         String?   @db.VarChar(20)
+  user_id              String?   @db.VarChar(20)
+  cno                  String?   @db.VarChar(20)
+  complaint_no         String?   @unique(map: "complaint_no") @db.VarChar(30)
+  complaint_year       String?   @db.VarChar(10)
+  certi_no             String?   @db.VarChar(60)
+  complainant_name     String?   @db.Text
+  respondent_name      String?   @db.Text
+  project_name         String?   @db.Text
+  ruling_by_maharera   String?   @db.VarChar(5)
+  judgement_by_officer String?   @db.VarChar(5)
+  ruling_date          String?   @db.VarChar(40)
+  citizen_complaint_id String?   @db.VarChar(30)
+  tbl_name             String?   @db.VarChar(60)
+  type                 String?   @db.VarChar(10)
+  interim_order        String?   @db.VarChar(5)
+  final_order          String?   @db.VarChar(5)
+  division             String?   @db.VarChar(10)
+  scraped_at           DateTime? @db.DateTime(0)
+
+  @@index([complaint_id], map: "idx_complaint_id")
+  @@index([complaint_no], map: "idx_complaint_no")
+  @@index([complaint_year], map: "idx_year")
+}
+
+model kerala_projects {
+  id                Int       @id @default(autoincrement())
+  project_id        String?   @unique(map: "project_id") @db.VarChar(20)
+  project_name      String?   @db.Text
+  builder_name      String?   @db.Text
+  rera_no           String?   @db.VarChar(50)
+  district          String?   @db.VarChar(100)
+  status            String?   @db.VarChar(50)
+  residential_units Int?
+  commercial_units  Int?
+  num_buildings     Int?
+  available_units   String?   @db.VarChar(20)
+  total_area        String?   @db.VarChar(30)
+  completion_date   String?   @db.VarChar(30)
+  more_info_url     String?   @db.VarChar(255)
+  scraped_at        DateTime? @db.DateTime(0)
+
+  @@index([project_id], map: "idx_project_id")
+  @@index([rera_no], map: "idx_rera_no")
+}
+
+model kerala_projects_excel {
+  id                 Int     @id @default(autoincrement())
+  project_name       String? @db.Text
+  promoter_name      String? @db.Text
+  project_type       String? @db.VarChar(100)
+  project_start_date String? @db.VarChar(20)
+  date_of_completion String? @db.VarChar(20)
+  certificate_no     String? @unique(map: "certificate_no") @db.VarChar(60)
+  certificate_date   String? @db.VarChar(20)
+  total_units        Float?  @db.Float
+  sold_units         Int?
+  status             String? @db.VarChar(50)
+  district           String? @db.VarChar(100)
+  village            String? @db.VarChar(100)
+  taluk              String? @db.VarChar(100)
+
+  @@index([certificate_no], map: "idx_cert_no")
+  @@index([district], map: "idx_district")
+  @@index([status], map: "idx_status")
+}
+
+model mp_projects {
+  id                   Int       @id @default(autoincrement())
+  sl_no                Int?
+  project_name         String?   @db.Text
+  project_type         String?   @db.VarChar(100)
+  district_plan_area   String?   @db.Text
+  rera_registration_no String?   @db.VarChar(100)
+  validity_period      String?   @db.Text
+  status               String?   @db.VarChar(100)
+  details_url          String?   @db.Text
+  scraped_at           DateTime? @db.DateTime(0)
+
+  @@index([rera_registration_no], map: "idx_rera_no")
+  @@index([status], map: "idx_status")
+}
+
+model original_application_pdfs {
+  project_id      Int       @id
+  document_id     String?   @db.VarChar(100)
+  file_name       String?   @db.VarChar(255)
+  pdf_filename    String?   @db.VarChar(255)
+  pdf_size_kb     Int?
+  download_status String?   @db.VarChar(50)
+  error_message   String?   @db.Text
+  downloaded_at   DateTime? @db.DateTime(0)
+  created_at      DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([downloaded_at], map: "idx_downloaded")
+  @@index([download_status], map: "idx_status")
+}
+
+model project_certificates {
+  id              Int       @id @default(autoincrement())
+  project_id      Int       @unique(map: "project_id")
+  pdf_filename    String?   @db.VarChar(200)
+  pdf_size_kb     Int?
+  download_status String?   @db.VarChar(50)
+  downloaded_at   DateTime? @db.DateTime(0)
+  created_at      DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([project_id], map: "idx_project_id")
+  @@index([download_status], map: "idx_status")
+}
+
+model project_details {
+  id                 Int       @id @default(autoincrement())
+  project_id         Int       @unique(map: "project_id")
+  project_name       String?   @db.VarChar(500)
+  registration_no    String?   @db.VarChar(100)
+  acknowledgement_no String?   @db.VarChar(100)
+  current_status     String?   @db.VarChar(150)
+  start_date         DateTime? @db.Date
+  completion_date    DateTime? @db.Date
+  registration_date  DateTime? @db.Date
+  address_line       String?   @db.Text
+  pin_code           String?   @db.VarChar(20)
+  state_name         String?   @db.VarChar(100)
+  district_name      String?   @db.VarChar(150)
+  taluka_name        String?   @db.VarChar(150)
+  village_name       String?   @db.VarChar(200)
+  boundaries_east    String?   @db.VarChar(300)
+  boundaries_west    String?   @db.VarChar(300)
+  boundaries_north   String?   @db.VarChar(300)
+  boundaries_south   String?   @db.VarChar(300)
+  promoter_name      String?   @db.VarChar(300)
+  contact_person     String?   @db.VarChar(200)
+  promoter_building  String?   @db.VarChar(200)
+  promoter_pincode   String?   @db.VarChar(20)
+  promoter_state     String?   @db.VarChar(100)
+  promoter_district  String?   @db.VarChar(150)
+  promoter_taluka    String?   @db.VarChar(150)
+  scraped_at         DateTime? @db.DateTime(0)
+  created_at         DateTime? @default(now()) @db.Timestamp(0)
+  updated_at         DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([district_name], map: "idx_district")
+  @@index([registration_no], map: "idx_reg_no")
+  @@index([current_status], map: "idx_status")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model puducherry_apartment_project {
+  id                                                            Int     @id @default(autoincrement())
+  sl_no                                                         String? @db.Text
+  name_of_promoter                                              String? @db.Text
+  address_of_promoter                                           String? @db.Text
+  description_of_project_for_which_registration_has_been_issued String? @db.Text
+  number_of_unit                                                String? @db.Text
+  registration_number                                           String? @db.Text
+  date_of_issue_of_registration                                 String? @db.Text
+  validity_up_to                                                String? @db.Text
+
+  @@ignore
+}
+
+model puducherry_defaulter_projects {
+  id            Int     @id @default(autoincrement())
+  project_name  String? @db.Text
+  location      String? @db.Text
+  reg_number    String? @db.VarChar(100)
+  promoter_name String? @db.Text
+  promoter_type String? @db.VarChar(100)
+  property_type String? @db.VarChar(100)
+  status        String? @db.VarChar(100)
+  detail_url    String? @db.Text
+
+  @@index([reg_number], map: "idx_reg_no")
+  @@index([status], map: "idx_status")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model puducherry_layout_project {
+  id                                                            Int     @id @default(autoincrement())
+  sl_no                                                         String? @db.Text
+  name_of_promoter                                              String? @db.Text
+  address_of_promoter                                           String? @db.Text
+  description_of_project_for_which_registration_has_been_issued String? @db.Text
+  number_of_unit_plots                                          String? @db.Text
+  registration_number                                           String? @db.Text
+  date_of_issue_of_registration                                 String? @db.Text
+  validity_up_to                                                String? @db.Text
+
+  @@ignore
+}
+
+model puducherry_rera_agents {
+  id              Int     @id @default(autoincrement())
+  sr_no           Int?
+  agent_name      String? @db.Text
+  address         String? @db.Text
+  description     String? @db.Text
+  registration_no String? @db.Text
+  issue_date      String? @db.VarChar(50)
+  validity_date   String? @db.VarChar(50)
+}
+
+model punjab_orders_judgements {
+  id               Int       @id @default(autoincrement())
+  serial_no        Int?
+  complaint_number String?   @db.VarChar(100)
+  complainant_name String?   @db.Text
+  respondent_name  String?   @db.Text
+  date_of_decision String?   @db.VarChar(50)
+  pdf_url          String?   @db.Text
+  pdf_filename     String?   @db.VarChar(255)
+  pdf_size_kb      Int?
+  download_status  String?   @db.VarChar(50)
+  downloaded_at    DateTime? @db.DateTime(0)
+  scraped_at       DateTime? @db.DateTime(0)
+
+  @@index([complaint_number], map: "idx_complaint")
+  @@index([date_of_decision], map: "idx_date")
+}
+
+model punjab_projects {
+  id                   Int       @id @default(autoincrement())
+  serial_no            Int?
+  district_name        String?   @db.VarChar(100)
+  promoter_name        String?   @db.Text
+  project_name         String?   @db.Text
+  rera_registration_no String?   @db.VarChar(100)
+  type_of_project      String?   @db.Text
+  project_location     String?   @db.Text
+  promoter_address     String?   @db.Text
+  contact_details      String?   @db.Text
+  imported_at          DateTime? @db.DateTime(0)
+
+  @@index([district_name], map: "idx_district")
+  @@index([rera_registration_no], map: "idx_rera_no")
+}
+
+
+model punjab_rera_projects {
+  id                          Int     @id @default(autoincrement())
+  sr_no                       Int?
+  district                    String? @db.VarChar(255)
+  promoter_name               String? @db.Text
+  project_name                String? @db.Text
+  registration_no             String? @db.VarChar(100)
+  type_of_project             String? @db.Text
+  project_location            String? @db.Text
+  promoter_address            String? @db.Text
+  contact_details_of_promoter String? @db.VarChar(100)
+
+  @@index([district], map: "idx_district")
+  @@index([registration_no], map: "idx_reg_no")
+  @@index([contact_details_of_promoter], map: "idx_status")
+}
+
+model rajasthan_agents {
+  id                    Int       @id @default(autoincrement())
+  district_name         String?   @db.VarChar(100)
+  agent_name            String?   @db.Text
+  application_no        String?   @db.VarChar(100)
+  submission_date       String?   @db.VarChar(50)
+  registration_no       String?   @unique(map: "unique_registration") @db.VarChar(100)
+  registration_date     String?   @db.VarChar(50)
+  view_details_url      String?   @db.Text
+  pdf_download_url      String?   @db.Text
+  pdf_file_path         String?   @db.Text
+  pdf_downloaded        Boolean?  @default(false)
+  pdf_download_attempts Int?      @default(0)
+  pdf_downloaded_at     DateTime? @db.DateTime(0)
+  scraped_at            DateTime? @db.DateTime(0)
+
+  @@index([registration_no], map: "idx_reg_no")
+}
+
+model registered_agents {
+  id                   Int       @id @default(autoincrement())
+  sr_no                Int?
+  agent_name           String    @db.VarChar(300)
+  certificate_no       String    @unique(map: "certificate_no") @db.VarChar(50)
+  view_details_url     String?   @db.Text
+  view_application_url String?   @db.Text
+  scraped_at           DateTime? @db.DateTime(0)
+  created_at           DateTime? @default(now()) @db.Timestamp(0)
+  updated_at           DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([agent_name(length: 255)], map: "idx_agent_name")
+  @@index([certificate_no], map: "idx_certificate_no")
+  @@index([scraped_at], map: "idx_scraped_at")
+}
+
+model registered_complaints {
+  id               Int       @id @default(autoincrement())
+  sr_no            Int?
+  complaint_no     String?   @unique(map: "complaint_no") @db.VarChar(30)
+  complainant_name String?   @db.Text
+  respondent_name  String?   @db.Text
+  scraped_at       DateTime? @db.DateTime(0)
+
+  @@index([complaint_no], map: "idx_complaint_no")
+  @@index([sr_no], map: "idx_sr_no")
+}
+
+model registered_projects {
+  id                    Int       @id @default(autoincrement())
+  project_id            String?   @unique(map: "unique_project") @db.VarChar(50)
+  project_name          String?   @db.VarChar(500)
+  promoter_name         String?   @db.VarChar(300)
+  location              String?   @db.VarChar(200)
+  state                 String?   @db.VarChar(100)
+  district              String?   @db.VarChar(100)
+  pincode               String?   @db.VarChar(20)
+  last_modified         DateTime? @db.Date
+  extension_certificate String?   @db.VarChar(50)
+  project_url           String?   @db.Text
+  scraped_at            DateTime? @db.DateTime(0)
+  created_at            DateTime? @default(now()) @db.Timestamp(0)
+  updated_at            DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([district], map: "idx_district")
+  @@index([project_name(length: 255)], map: "idx_project_name")
+  @@index([promoter_name(length: 255)], map: "idx_promoter")
+  @@index([state], map: "idx_state")
+}
+
+
+model rera_agents {
+  id              Int     @id @default(autoincrement())
+  sr_no           String? @db.VarChar(20)
+  registration_no String? @db.VarChar(100)
+  agent_name      String? @db.Text
+  address         String? @db.Text
+
+  
+}
+
+model rera_penalty_projects {
+  id              Int       @id @default(autoincrement())
+  sr_no           Int?
+  project_name    String?   @db.Text
+  registration_no String?   @db.Text
+  promoter_name   String?   @db.Text
+  penalty_amount  String?   @db.VarChar(100)
+  order_date      String?   @db.VarChar(100)
+  status          String?   @db.VarChar(100)
+  imported_at     DateTime? @db.DateTime(0)
+}
+
+model tamilnadu_agents {
+  id                    Int       @id @default(autoincrement())
+  year                  String?   @db.VarChar(50)
+  sl_no                 Int?
+  registration_no       String?   @db.Text
+  agent_name_address    String?   @db.Text
+  agent_type            String?   @db.VarChar(50)
+  registration_validity String?   @db.Text
+  scraped_at            DateTime? @db.DateTime(0)
+
+  @@index([agent_type], map: "idx_type")
+  @@index([year], map: "idx_year")
+}
+
+model tamilnadu_complaints {
+  id                  Int       @id @default(autoincrement())
+  complaint_type      String?   @db.VarChar(50)
+  year                Int?
+  sl_no               Int?
+  complaint_no        String?   @db.Text
+  complainant         String?   @db.Text
+  respondent          String?   @db.Text
+  project             String?   @db.Text
+  date_of_final_order String?   @db.VarChar(50)
+  order_pdf_url       String?   @db.Text
+  order_pdf_filename  String?   @db.VarChar(255)
+  order_pdf_size_kb   Int?
+  download_status     String?   @db.VarChar(50)
+  scraped_at          DateTime? @db.DateTime(0)
+
+  @@index([complaint_no(length: 100)], map: "idx_complaint_no")
+  @@index([complaint_type, year], map: "idx_type_year")
+}
+
+model tamilnadu_projects {
+  id                        Int       @id @default(autoincrement())
+  year                      Int?
+  sl_no                     Int?
+  project_registration_no   String?   @db.Text
+  promoter_name_address     String?   @db.Text
+  project_details_address   String?   @db.Text
+  approval_details_url      String?   @db.Text
+  approval_details_filename String?   @db.VarChar(255)
+  project_completion_date   String?   @db.Text
+  other_details             String?   @db.Text
+  other_details_urls        String?   @db.Text
+  current_status            String?   @db.Text
+  current_status_url        String?   @db.Text
+  current_status_filename   String?   @db.VarChar(255)
+  scraped_at                DateTime? @db.DateTime(0)
+
+  @@index([year], map: "idx_year")
+}
+
+model telangana_agents {
+  id                     Int       @id @default(autoincrement())
+  sr_no                  String?   @db.VarChar(20)
+  agent_name             String?   @db.Text
+  registration_no        String?   @db.Text
+  view_details_link      String?   @db.Text
+  last_modified_date     String?   @db.VarChar(50)
+  certificate_link       String?   @db.Text
+  extension_link         String?   @db.Text
+  map_link               String?   @db.Text
+  certificate_downloaded Boolean?  @default(false)
+  scraped_at             DateTime? @db.DateTime(0)
+
+  @@index([agent_name(length: 100)], map: "idx_agent")
+}
+
+model telangana_cause_list {
+  id             Int       @id @default(autoincrement())
+  sr_no          Int?
+  subject        String?   @db.Text
+  date           String?   @db.VarChar(20)
+  pdf_url        String?   @db.Text
+  pdf_filename   String?   @db.VarChar(255)
+  pdf_downloaded Boolean?  @default(false)
+  page_number    Int?
+  scraped_at     DateTime? @db.DateTime(0)
+
+  @@unique([sr_no, date], map: "unique_entry")
+}
+
+model telangana_orders {
+  id             Int       @id @default(autoincrement())
+  sr_no          Int?
+  subject        String?   @db.Text
+  date           String?   @db.VarChar(20)
+  pdf_url        String?   @db.Text
+  pdf_filename   String?   @db.VarChar(255)
+  pdf_downloaded Boolean?  @default(false)
+  page_number    Int?
+  scraped_at     DateTime? @db.DateTime(0)
+
+  @@unique([sr_no, date, subject(length: 100)], map: "unique_order")
+}
+
+model telangana_projects {
+  id                     Int       @id @default(autoincrement())
+  sr_no                  String?   @db.VarChar(20)
+  project_name           String?   @db.Text
+  promoter_name          String?   @db.Text
+  view_details_link      String?   @db.Text
+  last_modified_date     String?   @db.VarChar(50)
+  certificate_link       String?   @db.Text
+  extension_link         String?   @db.Text
+  map_link               String?   @db.Text
+  certificate_downloaded Boolean?  @default(false)
+  scraped_at             DateTime? @db.DateTime(0)
+
+  @@index([project_name(length: 100)], map: "idx_project")
+  @@index([promoter_name(length: 100)], map: "idx_promoter")
+}
+
+model up_projects {
+  id                Int       @id @default(autoincrement())
+  sl_no             Int?
+  promoter_name     String?   @db.Text
+  project_name      String?   @db.Text
+  rera_reg_no       String?   @db.VarChar(100)
+  project_type      String?   @db.VarChar(100)
+  district          String?   @db.VarChar(100)
+  start_date        String?   @db.VarChar(50)
+  end_date          String?   @db.VarChar(50)
+  registration_date String?   @db.VarChar(50)
+  details_url       String?   @db.Text
+  details_scraped   Boolean?  @default(false)
+  scraped_at        DateTime? @db.DateTime(0)
+
+  @@index([details_scraped], map: "idx_details_scraped")
+  @@index([district], map: "idx_district")
+  @@index([rera_reg_no], map: "idx_rera_no")
+}
+
+model uttarakhand_agents {
+  id                   Int       @id @default(autoincrement())
+  agent_name           String?   @db.Text
+  location             String?   @db.Text
+  reg_number           String?   @db.VarChar(100)
+  date_of_registration String?   @db.Text
+  type_of_registration String?   @db.VarChar(100)
+  contact_number       String?   @db.VarChar(50)
+  reason_of_revoke     String?   @db.Text
+  read_more_url        String?   @db.Text
+  scraped_at           DateTime? @db.DateTime(0)
+
+  @@index([reg_number], map: "idx_reg_no")
+}
+
+model uttarakhand_projects {
+  id               Int       @id @default(autoincrement())
+  project_name     String?   @db.Text
+  location         String?   @db.Text
+  reg_number       String?   @db.VarChar(100)
+  promoter         String?   @db.Text
+  promoter_type    String?   @db.VarChar(100)
+  property_type    String?   @db.VarChar(100)
+  reason_of_revoke String?   @db.Text
+  read_more_url    String?   @db.Text
+  scraped_at       DateTime? @db.DateTime(0)
+
+  @@index([reg_number], map: "idx_reg_no")
+}
+
+model west_bengal_agents {
+  id                Int     @id @default(autoincrement())
+  agent_id          String? @db.VarChar(100)
+  agent_name        String? @db.Text
+  registered_from   String? @db.VarChar(100)
+  registration_no   String? @db.VarChar(100)
+  registration_date String? @db.VarChar(50)
+  detail_url        String? @db.Text
+}
+
+model westbengal_defaulters {
+  id                            Int       @id @default(autoincrement())
+  application_no                String?   @unique(map: "unique_app_no") @db.VarChar(100)
+  type                          String?   @db.VarChar(100)
+  name                          String?   @db.Text
+  address                       String?   @db.Text
+  intimation_rejection_url      String?   @db.Text
+  intimation_rejection_filename String?   @db.VarChar(255)
+  intimation_rejection_size_kb  Int?
+  remarks                       String?   @db.Text
+  download_status               String?   @db.Text
+  scraped_at                    DateTime? @db.DateTime(0)
+
+  @@index([application_no], map: "idx_app_no")
+}
+
+model westbengal_projects {
+  id                  Int       @id @default(autoincrement())
+  sl_no               String?   @db.VarChar(20)
+  project_id          String?   @db.VarChar(100)
+  project_name        String?   @db.Text
+  completion_date     String?   @db.VarChar(50)
+  registration_no     String?   @db.VarChar(100)
+  registration_date   String?   @db.VarChar(50)
+  project_details_url String?   @db.Text
+  scraped_at          DateTime? @db.DateTime(0)
+}
