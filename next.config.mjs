@@ -5,4 +5,4 @@ const nextConfig = {webpack: (config) => {
   },
 }
 
-module.exports = nextConfig
+export default nextConfig
