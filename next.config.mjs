@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {webpack: (config) => {
+    config.externals.push('@prisma/client')
+    return config
+  },
+}
 
-export default nextConfig
+module.exports = nextConfig
