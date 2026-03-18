@@ -5,7 +5,7 @@ import { ArrowLeft, MapPin, Loader2, Building2, Users, FileText, ChevronRight } 
 import Link from 'next/link'
 import CardGrid from '@/components/CardGrid'
 import { stateConfig } from '@/lib/stateConfig'
-import DebugFields from '@/components/DebugFields'
+
 
 interface CategoryPageProps {
   params: Promise<{
@@ -243,7 +243,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 </div>
               </div>
             )}
-            <DebugFields data={data}/>
+            
             <CardGrid
               data={data}
               state={state}
