@@ -8,15 +8,15 @@ import { stateConfig } from '@/lib/stateConfig'
 
 
 interface SubCategoryPageProps {
-  params: Promise<{
+  params: {
     state: string
     category: string
     subcategory: string
-  }>
+  }
 }
 
 export default function SubCategoryPage({ params }: SubCategoryPageProps) {
-  const { state, category: region, subcategory } = use(params)
+  const { state, category: region, subcategory } = params
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

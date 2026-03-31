@@ -6,13 +6,13 @@ import Link from 'next/link'
 import { stateConfig } from '@/lib/stateConfig'
 
 interface StatePageProps {
-  params: Promise<{
+  params: {
     state: string
-  }>
+  }
 }
 
 export default function StatePage({ params }: StatePageProps) {
-  const { state } = use(params)
+  const { state } = params
   const config = stateConfig[state as keyof typeof stateConfig]
 
   if (!config) {

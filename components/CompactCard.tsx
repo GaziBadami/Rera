@@ -1,6 +1,6 @@
 'use client'
 
-import { User, MapPin, Phone, Calendar, FileText, ExternalLink } from 'lucide-react'
+import { User, MapPin, Phone, Calendar, FileText, ExternalLink, Download } from 'lucide-react'
 import { makeAbsoluteUrl } from '@/lib/urlUtils'
 
 interface CompactCardProps {
@@ -11,7 +11,6 @@ interface CompactCardProps {
 }
 
 export default function CompactCard({ data, state, type = 'general', onClick }: CompactCardProps) {
-  // Auto-detect field names based on type
   const getName = () => {
     if (type === 'agent') {
       return data.agent_name || 
@@ -50,7 +49,6 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
              data.remarks ||
              data.category || 
              data.agent_type 
-             
     }
     return data.promoter_name || 
            data.promoter || 
@@ -126,9 +124,21 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
 
   // Find PDF URL
   let pdfUrl = null
-  const pdfKeys = Object.keys(data).filter(key => key.includes('pdf') || key.includes('url'))
+  const pdfKeys = Object.keys(data).filter(key => key.includes('pdf') && key.includes('url'))
   if (pdfKeys.length > 0) {
     pdfUrl = makeAbsoluteUrl(data[pdfKeys[0]], state)
+  }
+
+  // Find detail URL
+  let detailUrl = null
+  const urlKeys = Object.keys(data).filter(key =>
+    (key.includes('url') || key.includes('link')) &&
+    !key.includes('pdf') &&
+    data[key] &&
+    data[key] !== 'null'
+  )
+  if (urlKeys.length > 0) {
+    detailUrl = makeAbsoluteUrl(data[urlKeys[0]], state)
   }
 
   const name = getName()
@@ -138,10 +148,18 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
   const date = getDate()
   const contact = getContact()
 
+  const handleCardClick = () => {
+    if (detailUrl) {
+      window.open(detailUrl, '_blank', 'noopener,noreferrer')
+    } else {
+      onClick?.()
+    }
+  }
+
   return (
     <div
-      onClick={onClick}
-      className="group bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 overflow-hidden cursor-pointer"
+      onClick={handleCardClick}
+      className="group relative bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 overflow-hidden cursor-pointer"
     >
       <div className="flex items-center p-3 gap-3">
         {/* Icon */}
@@ -159,13 +177,34 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-sm text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                {name}
-              </h4>
+              {/* Name with tooltip */}
+              <div className="relative group/tooltip">
+                <h4 className="font-semibold text-sm text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition cursor-pointer">
+                  {name}
+                </h4>
+                {/* Tooltip */}
+                {name && name.length > 40 && (
+                  <div className="absolute left-0 top-full mt-1 z-50 hidden group-hover/tooltip:block w-max max-w-xs bg-slate-900 dark:bg-slate-700 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none">
+                    {name}
+                    {/* Arrow */}
+                    <div className="absolute -top-1 left-4 w-2 h-2 bg-slate-900 dark:bg-slate-700 rotate-45" />
+                  </div>
+                )}
+              </div>
+
+              {/* Secondary info with tooltip */}
               {secondaryInfo && (
-                <p className="text-xs text-slate-600 dark:text-slate-400 truncate mt-0.5">
-                  {secondaryInfo}
-                </p>
+                <div className="relative group/tooltip2 mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
+                    {secondaryInfo}
+                  </p>
+                  {secondaryInfo && secondaryInfo.length > 40 && (
+                    <div className="absolute left-0 top-full mt-1 z-50 hidden group-hover/tooltip2:block w-max max-w-xs bg-slate-900 dark:bg-slate-700 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none">
+                      {secondaryInfo}
+                      <div className="absolute -top-1 left-4 w-2 h-2 bg-slate-900 dark:bg-slate-700 rotate-45" />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             
@@ -183,10 +222,19 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
           {/* Bottom Info Row */}
           <div className="flex items-center justify-between mt-2 gap-2">
             <div className="flex items-center space-x-3 text-xs text-slate-600 dark:text-slate-400">
+              {/* Location with tooltip */}
               {location && (
-                <div className="flex items-center space-x-1">
-                  <MapPin className="w-3 h-3" />
-                  <span className="truncate max-w-[150px]">{location}</span>
+                <div className="relative group/tooltip3">
+                  <div className="flex items-center space-x-1">
+                    <MapPin className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate max-w-[150px]">{location}</span>
+                  </div>
+                  {location && location.length > 20 && (
+                    <div className="absolute left-0 top-full mt-1 z-50 hidden group-hover/tooltip3:block w-max max-w-xs bg-slate-900 dark:bg-slate-700 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none">
+                      {location}
+                      <div className="absolute -top-1 left-4 w-2 h-2 bg-slate-900 dark:bg-slate-700 rotate-45" />
+                    </div>
+                  )}
                 </div>
               )}
               
@@ -207,16 +255,23 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
               )}
               
               {pdfUrl && (
-                <a
-                  href={pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
+                <button
+                  onClick={(e) => { e.stopPropagation(); window.open(pdfUrl!, '_blank', 'noopener,noreferrer') }}
                   className="p-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50 transition"
                   title="View PDF"
                 >
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+              )}
+
+              {detailUrl && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); window.open(detailUrl!, '_blank', 'noopener,noreferrer') }}
+                  className="p-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition"
+                  title="View Details"
+                >
                   <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                </button>
               )}
             </div>
           </div>

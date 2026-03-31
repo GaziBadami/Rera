@@ -1,6 +1,6 @@
 'use client'
 
-import { Building2, MapPin, Calendar, Download, ExternalLink, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { Building2, MapPin, Calendar, Download, ExternalLink, CheckCircle, Clock } from 'lucide-react'
 import { makeAbsoluteUrl } from '@/lib/urlUtils'
 
 interface ProjectCardProps {
@@ -45,8 +45,6 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
     )
   }
 
-  // Auto-detect field names (different states have different column names)
-  // Try multiple possible field names in order of preference
   const projectName = project.project_name || 
                       project.name || 
                       project.project || 
@@ -58,7 +56,7 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
                       project.title_header ||
                       project.complainant_name ||
                       project.subject ||
-                      project.project_registration_no || // Andaman uses this as identifier
+                      project.project_registration_no ||
                       'Unnamed Project'
                       
   const promoterName = project.promoter_name || 
@@ -70,10 +68,10 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
                        project.developer ||
                        project.builder_name ||
                        project.builder ||
-                       project.respondent_name || // For complaints
+                       project.respondent_name ||
                        project.company_name ||
                        project.remarks ||
-                       project.applicant_name_address || // Andaman
+                       project.applicant_name_address ||
                        'Unknown Promoter'
                        
   const location = project.location || 
@@ -99,8 +97,6 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
                 project.project_registration_no ||
                 project.project_id ||
                 project.reg_no_date ||
-                project.rera_no || 
-                project.survey_no ||
                 project.aprera_registration_id ||
                 project.registration_cert_number ||
                 project.file_no ||
@@ -114,13 +110,13 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
                  project.type || 
                  project.certificate_status ||
                  project.approval_status ||
-                 project.current_status // Andaman
+                 project.current_status
                  
   const completionDate = project.completion_date || 
                          project.proposed_end_date || 
                          project.extended_proposed_end_date ||
                          project.expected_completion_date ||
-                         project.project_completion_date || // Andaman
+                         project.project_completion_date ||
                          project.end_date ||
                          project.date_of_order ||
                          project.property_typ
@@ -158,10 +154,18 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
     detailUrl = makeAbsoluteUrl(project[urlKeys[0]], state)
   }
 
+  const handleCardClick = () => {
+    if (detailUrl) {
+      window.open(detailUrl, '_blank', 'noopener,noreferrer')
+    } else {
+      onClick?.()
+    }
+  }
+
   return (
-    <div 
-      onClick={onClick}
-      className="group bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 overflow-hidden cursor-pointer"
+    <div
+      onClick={handleCardClick}
+      className="group relative bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 overflow-hidden cursor-pointer"
     >
       {/* Header */}
       <div className="p-4 border-b border-slate-100 dark:border-slate-700">
@@ -176,7 +180,6 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
           </div>
           {status && getStatusBadge(status)}
         </div>
-        
         <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
           {promoterName}
         </p>
@@ -188,13 +191,11 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
           <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
           <span className="text-slate-600 dark:text-slate-400 line-clamp-2">{location}</span>
         </div>
-
         <div className="flex items-center justify-between text-xs">
           <div className="text-slate-500 dark:text-slate-500">
             <span className="font-medium text-slate-700 dark:text-slate-300">Reg:</span> {regNo}
           </div>
         </div>
-
         {completionDate && (
           <div className="flex items-center space-x-1.5 text-xs text-slate-500 dark:text-slate-500">
             <Calendar className="w-3.5 h-3.5" />
@@ -207,31 +208,24 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
       <div className="p-3 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           {pdfUrl && (
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+            <button
+              onClick={(e) => { e.stopPropagation(); window.open(pdfUrl!, '_blank', 'noopener,noreferrer') }}
               className="flex items-center space-x-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50 transition text-xs font-medium"
             >
               <Download className="w-3 h-3" />
               <span>PDF</span>
-            </a>
+            </button>
           )}
           {detailUrl && (
-            <a
-              href={detailUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+            <button
+              onClick={(e) => { e.stopPropagation(); window.open(detailUrl!, '_blank', 'noopener,noreferrer') }}
               className="flex items-center space-x-1 px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-300 dark:hover:bg-slate-600 transition text-xs font-medium"
             >
               <ExternalLink className="w-3 h-3" />
               <span>View</span>
-            </a>
+            </button>
           )}
         </div>
-        
         {regDate && (
           <span className="text-xs text-slate-500 dark:text-slate-500">
             {regDate}

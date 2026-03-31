@@ -8,14 +8,14 @@ import { stateConfig } from '@/lib/stateConfig'
 
 
 interface CategoryPageProps {
-  params: Promise<{
+  params: {
     state: string
     category: string
-  }>
+  }
 }
 
 export default function CategoryPage({ params }: CategoryPageProps) {
-  const { state, category } = use(params)
+  const { state, category } = params
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
