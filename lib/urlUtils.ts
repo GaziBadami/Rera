@@ -33,7 +33,7 @@ export function makeAbsoluteUrl(url: string | null | undefined, state: string): 
   
   // Already absolute
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url
+    return encodeURI(decodeURI(url))
   }
   
   // Get base domain for state
@@ -47,5 +47,5 @@ export function makeAbsoluteUrl(url: string | null | undefined, state: string): 
   // Ensure URL starts with /
   const path = url.startsWith('/') ? url : `/${url}`
   
-  return `${baseDomain}${path}`
+  return encodeURI(`${baseDomain}${path}`)
 }

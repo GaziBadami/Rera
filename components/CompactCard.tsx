@@ -124,21 +124,30 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
 
   // Find PDF URL
   let pdfUrl = null
-  const pdfKeys = Object.keys(data).filter(key => key.includes('pdf') && key.includes('url'))
+  const pdfKeys = Object.keys(data).filter(key => 
+  (key.includes('pdf') || key.includes('certificate')) && 
+  (key.includes('url') || key.includes('link')) &&
+  data[key] &&
+  data[key] !== 'null'
+)
   if (pdfKeys.length > 0) {
     pdfUrl = makeAbsoluteUrl(data[pdfKeys[0]], state)
   }
 
   // Find detail URL
   let detailUrl = null
-  const urlKeys = Object.keys(data).filter(key =>
+  const nonPdfUrlKeys = Object.keys(data).filter(key =>
     (key.includes('url') || key.includes('link')) &&
     !key.includes('pdf') &&
+    !key.includes('certificate') &&
     data[key] &&
     data[key] !== 'null'
   )
-  if (urlKeys.length > 0) {
-    detailUrl = makeAbsoluteUrl(data[urlKeys[0]], state)
+
+  if(nonPdfUrlKeys.length > 0) {
+    detailUrl = makeAbsoluteUrl(data[nonPdfUrlKeys[0]], state)
+  } else if (pdfUrl) {
+    detailUrl = pdfUrl
   }
 
   const name = getName()
@@ -149,12 +158,16 @@ export default function CompactCard({ data, state, type = 'general', onClick }: 
   const contact = getContact()
 
   const handleCardClick = () => {
-    if (detailUrl) {
-      window.open(detailUrl, '_blank', 'noopener,noreferrer')
-    } else {
-      onClick?.()
-    }
-  }
+  const params = new URLSearchParams({
+    url: detailUrl || '',
+    title: name,
+    state: state,
+    regNo: regNo || '',
+    location: location || '',
+    pdfUrl: pdfUrl || '',
+  })
+  window.open(`/view?${params.toString()}`, '_blank')
+}
 
   return (
     <div

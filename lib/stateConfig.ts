@@ -131,12 +131,7 @@ export const stateConfig = {
       penalty: { table: 'rera_penalty_projects', label: 'Penalty Projects' }
     }
   },
-  'rajasthan': {
-    name: 'Rajasthan',
-    categories: {
-      agents: { table: 'rajasthan_agents', label: 'Agents' }
-    }
-  },
+
   'tamil-nadu': {
     name: 'Tamil Nadu',
     categories: {
@@ -177,20 +172,6 @@ export const stateConfig = {
       defaulters: { table: 'bihar_defaulters', label: 'Defaulters' },
       orders: { table: 'bihar_interim_orders', label: 'Orders' }
     }
-  },
-  'tripura': {
-    name: 'Tripura',
-    categories: {
-
-    }
-  },
-  'dnhdad': {
-    name: 'Dadra & Nagar Haveli and Daman & Diu',
-    categories: {}
-  },
-  'lakshwadweep': {
-    name: 'Lakshwadweep',
-    categories: {}
   },
 
 }

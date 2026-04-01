@@ -155,11 +155,19 @@ export default function ProjectCard({ project, state, onClick }: ProjectCardProp
   }
 
   const handleCardClick = () => {
-    if (detailUrl) {
-      window.open(detailUrl, '_blank', 'noopener,noreferrer')
-    } else {
-      onClick?.()
-    }
+    const encodedUrl = detailUrl ? encodeURI(detailUrl) : ''
+    const params = new URLSearchParams({
+      url: encodedUrl || '',
+      title: projectName,
+      state: state,
+      regNo: regNo !== 'N/A' ? regNo : '',
+      location: location !== 'Location not specified' ? location : '',
+      promoter: promoterName !== 'Unknown Promoter' ? promoterName : '',
+      status: status || '',
+      pdfUrl: pdfUrl || '',
+    })
+    window.open(`/view?${params.toString()}`, '_blank')
+  
   }
 
   return (

@@ -67,7 +67,7 @@ export default function CardGrid({ data, state, type = 'general', defaultView = 
               <ProjectCard
                 key={index}
                 project={item}
-                state={state}
+                state={item.state || state}
               />
             ))}
           </div>
@@ -78,7 +78,7 @@ export default function CardGrid({ data, state, type = 'general', defaultView = 
               <CompactCard
                 key={index}
                 data={item}
-                state={state}
+                state={item.state || state}
                 type={type}
               />
             ))}
@@ -90,7 +90,7 @@ export default function CardGrid({ data, state, type = 'general', defaultView = 
             <CompactCard
               key={index}
               data={item}
-              state={state}
+              state={item.state || state}
               type={type === 'project' ? 'general' : type}
             />
           ))}
